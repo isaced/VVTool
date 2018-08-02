@@ -70,7 +70,7 @@ module VVPrepare
       templateName = File.basename aTemplatePath, '.*'
 
       next if not File.directory? aTemplatePath
-      next if not File.exist?(File.join(aTemplatePath, "#{templateName}.json"))
+      next if not File.exist?(File.join(aTemplatePath, "#{templateName}.xml"))
       next if templateName.start_with? '.'
 
       # 把所有模版名记录下来
