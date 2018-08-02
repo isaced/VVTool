@@ -16,6 +16,8 @@ gem install vvtool
 
 > 因为 VV 模版的编译器需要 Java 环境，所以另外需要 java 环境支持。
 
+[![asciicast](https://asciinema.org/a/rtmYrXUexTG67RNpuGfGdvvGQ.png)](https://asciinema.org/a/rtmYrXUexTG67RNpuGfGdvvGQ)
+
 ## 运行
 
 切换到你的模版列表目录，然后执行如下命令即可：
