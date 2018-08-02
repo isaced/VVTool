@@ -60,3 +60,7 @@ vvtool run
 ## 二维码扫描
 
 每个模版目录下会生成类似 `xx_QR.png` 的二维码图片，指向当前模版对应的本地HTTP 地址，如 *http://127.0.0.1:7788/helloworld/data.json* ，对应 iOS/Android Playground 应用可通过二维码扫描读取该路径中的模版和数据，然后在客户端加载。
+
+## 原理
+
+![source](https://i.loli.net/2018/08/02/5b630f232a97e.png)
