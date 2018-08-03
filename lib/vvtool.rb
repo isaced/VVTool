@@ -13,7 +13,7 @@ module VVTool
 
       desc "about", "关于"
       def about
-        puts "这个命令主要用于 VirtualView 实时预览"
+        puts "这个命令主要用于 VirtualView 实时预览 - https://github.com/isaced/VVTool"
       end
     end
 end

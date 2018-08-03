@@ -10,16 +10,19 @@ require 'net/http'
 
 # 路径
 PropertiesFileName = 'templatelist.properties'
+ConfigPropertiesFileName = 'config.properties'
 CompilerFileName = '.compiler.jar'
 TemplatesPath = Dir.pwd
 TemplatePath = File.join(TemplatesPath, 'template')
 VVBuildPath = File.join(TemplatesPath, 'build')
 VVBuildLogFilePath = File.join(TemplatesPath, '.vvbuild.log')
 VVCompilerFilePath = File.join(TemplatesPath, CompilerFileName)
+VVConfigPropertiesFilePath = File.join(TemplatesPath, ConfigPropertiesFileName)
 PropertiesFilePath = File.join(TemplatesPath, PropertiesFileName)
 DirFilePath = File.join(TemplatesPath, '.dir')
 
-VVCompilerDownloadURL = 'https://raw.githubusercontent.com/alibaba/virtualview_tools/master/compiler-tools/TemplateWorkSpace/compiler.jar'
+VVCompilerDownloadURL = 'https://raw.githubusercontent.com/alibaba/virtualview_tools/bb727ac668856732f66c3845b27646c1b4124fc8/compiler-tools/TemplateWorkSpace/compiler.jar'
+VVConfigPropertiesDownloadURL = 'https://raw.githubusercontent.com/alibaba/virtualview_tools/bb727ac668856732f66c3845b27646c1b4124fc8/compiler-tools/TemplateWorkSpace/config.properties'
 
 $buildCount = 1
 
@@ -43,6 +46,7 @@ module VVPrepare
     }
   end
 
+  # 检查和下载 VV 编译器
   def self.checkVVCompiler()
     if File.exist? VVCompilerFilePath
       puts 'Check VV compiler ok.'
@@ -53,6 +57,22 @@ module VVPrepare
         puts 'VV compiler.jar download success.'
       else
         puts 'VV compiler.jar download fail.'
+        exit
+      end
+    end
+  end
+
+  # 检查和下载 config.properties
+  def self.checkVVConfigProperties()
+    if File.exist? VVConfigPropertiesFilePath
+      puts 'Check VV config.properties ok.'
+    else
+      puts 'Start downloading VV config.properties...'
+      File.write(VVConfigPropertiesFilePath, Net::HTTP.get(URI.parse(VVConfigPropertiesDownloadURL)))
+      if File.exist? VVConfigPropertiesFilePath
+        puts 'VV config.properties download success.'
+      else
+        puts 'VV config.properties download fail.'
         exit
       end
     end
@@ -124,7 +144,10 @@ def firstBuild()
   VVPrepare.clean
 
   # 0.1 检查编译器 - 没有则下载
-  VVPrepare.checkVVCompiler()
+  VVPrepare.checkVVCompiler
+
+  # 0.2 检查 config.properties - 没有则下载
+  VVPrepare.checkVVConfigProperties
 
   puts 'Start build templates...'
 
