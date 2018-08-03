@@ -15,6 +15,12 @@ module VVTool
       def about
         puts "这个命令主要用于 VirtualView 实时预览 - https://github.com/isaced/VVTool"
       end
+
+      map %w[--version -v] => :__print_version
+      desc "--version, -v", "版本"
+      def __print_version
+        puts VVTool::VERSION
+      end
     end
 end
 
