@@ -1,6 +1,6 @@
 # VVTool
 
-![Gem](https://img.shields.io/gem/v/vvtool.svg)
+[![Gem](https://img.shields.io/gem/v/vvtool.svg)](https://rubygems.org/gems/vvtool)
 
 这是一个加速开发 Virtual View 模版的小脚本，让你能脱离繁重的开发环境 Xcode 和 Android Studio，只需一个轻量级的文本编辑器如 VSCode/Atom/SublimeText 即可开始进入开发，并且提供热加载能力，大大加速提高开发调试效率。
 
@@ -64,3 +64,5 @@ vvtool run
 ## 原理
 
 ![source](https://i.loli.net/2018/08/02/5b630f232a97e.png)
+
+> 编译工具依赖 [alibaba/virtualview_tools](https://github.com/alibaba/virtualview_tools)
