@@ -1,0 +1,7 @@
+language: ruby
+rvm:
+ - 1.9
+ - 2.3
+ - 2.5
+ - 2.6
+script: "rake build"
