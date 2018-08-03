@@ -7,6 +7,8 @@ require 'Listen'
 require 'base64'
 require 'json'
 require 'net/http'
+require 'socket'
+require 'rqrcode'
 
 # 路径
 PropertiesFileName = 'templatelist.properties'
@@ -23,6 +25,9 @@ DirFilePath = File.join(TemplatesPath, '.dir')
 
 VVCompilerDownloadURL = 'https://raw.githubusercontent.com/alibaba/virtualview_tools/bb727ac668856732f66c3845b27646c1b4124fc8/compiler-tools/TemplateWorkSpace/compiler.jar'
 VVConfigPropertiesDownloadURL = 'https://raw.githubusercontent.com/alibaba/virtualview_tools/bb727ac668856732f66c3845b27646c1b4124fc8/compiler-tools/TemplateWorkSpace/config.properties'
+
+LocalIP = Socket::getaddrinfo(Socket.gethostname,"echo",Socket::AF_INET)[0][3]
+HTTPServerPort = 7788
 
 $buildCount = 1
 
@@ -123,6 +128,11 @@ module VVPrepare
           f.write(JSON.pretty_generate dataHash)
         }
       end
+
+      # 生成二维码
+      qrcode = RQRCode::QRCode.new("http://#{LocalIP}:#{HTTPServerPort}/#{templateName}/data.json")
+      qrcodeFilePath = File.join(aTemplatePath, "#{templateName}_QR.png")
+      qrcode.as_png(file: qrcodeFilePath)
     }
 
     # 生成模版目录结构 .dir（HTTP Server 读取）
@@ -198,7 +208,7 @@ def live_server_run
     # HTTP Server
     Thread.new {
       http_server = WEBrick::HTTPServer.new(
-        :Port => 7788,  
+        :Port => HTTPServerPort,  
         :DocumentRoot => TemplatesPath,
         :Logger => WEBrick::Log.new(VVBuildLogFilePath),
         :AccessLog => []
@@ -206,7 +216,7 @@ def live_server_run
       http_server.start
     }
 
-    puts 'Start HTTP server: http://127.0.0.1:7788'
+    puts "Start HTTP server: http://#{LocalIP}:#{HTTPServerPort}"
 
     # File Watch
     listener = Listen.to(TemplatesPath, only: [/\.xml$/, /\.json$/]) { |modified, added, removed|
@@ -239,3 +249,5 @@ def live_server_run
 
     sleep
 end
+
+# live_server_run

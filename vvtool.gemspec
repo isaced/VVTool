@@ -28,4 +28,5 @@ Gem::Specification.new do |spec|
   
   spec.add_dependency "thor", "~> 0.20"
   spec.add_dependency "listen", "~> 3.0"
+  spec.add_dependency "rqrcode", "~> 0.10.0"
 end
