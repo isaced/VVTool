@@ -15,6 +15,8 @@ gem install vvtool
 ```
 
 > 因为 VV 模版的编译器需要 Java 环境，所以另外需要 java 环境支持。
+>
+> 如果安装很慢或者超时，可以尝试切换下 RubyGems 源：https://gems.ruby-china.org/
 
 [![asciicast](https://asciinema.org/a/rtmYrXUexTG67RNpuGfGdvvGQ.png)](https://asciinema.org/a/rtmYrXUexTG67RNpuGfGdvvGQ)
 
