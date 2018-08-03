@@ -4,4 +4,4 @@ rvm:
  - 2.3
  - 2.5
  - 2.6
-script: "rake build"
+script: "rake build --no-deployment"
