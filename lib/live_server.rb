@@ -247,6 +247,9 @@ def live_server_run
       exit 130
     end
 
+    # 从 RubyGems 上检查新版本
+    check_new_version
+
     sleep
 end
 
