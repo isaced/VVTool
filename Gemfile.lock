@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vvtool (0.1.2)
+    vvtool (0.1.4)
       listen (~> 3.0)
       rqrcode (~> 0.10.0)
       thor (~> 0.20)
@@ -33,4 +33,4 @@ DEPENDENCIES
   vvtool!
 
 BUNDLED WITH
-   1.16.3
+   1.16.4

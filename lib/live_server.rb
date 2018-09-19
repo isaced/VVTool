@@ -10,6 +10,9 @@ require 'net/http'
 require 'socket'
 require 'rqrcode'
 
+require_relative 'utils.rb'
+require_relative "version_checker.rb"
+
 # 路径
 PropertiesFileName = 'templatelist.properties'
 ConfigPropertiesFileName = 'config.properties'
@@ -23,12 +26,18 @@ VVConfigPropertiesFilePath = File.join(TemplatesPath, ConfigPropertiesFileName)
 PropertiesFilePath = File.join(TemplatesPath, PropertiesFileName)
 DirFilePath = File.join(TemplatesPath, '.dir')
 
+# VV 编译器下载地址 URL
 VVCompilerDownloadURL = 'https://raw.githubusercontent.com/alibaba/virtualview_tools/bb727ac668856732f66c3845b27646c1b4124fc8/compiler-tools/TemplateWorkSpace/compiler.jar'
+# VV 默认的 config.properties 下载地址 URL
 VVConfigPropertiesDownloadURL = 'https://raw.githubusercontent.com/alibaba/virtualview_tools/bb727ac668856732f66c3845b27646c1b4124fc8/compiler-tools/TemplateWorkSpace/config.properties'
 
-LocalIP = Socket::getaddrinfo(Socket.gethostname,"echo",Socket::AF_INET)[0][3]
+# 获取本机 IP
+LocalIP = get_first_public_ipv4()
+
+# HTTP 服务端口号
 HTTPServerPort = 7788
 
+# 编译次数计数
 $buildCount = 1
 
 module VVPrepare
@@ -130,9 +139,11 @@ module VVPrepare
       end
 
       # 生成二维码
-      qrcode = RQRCode::QRCode.new("http://#{LocalIP}:#{HTTPServerPort}/#{templateName}/data.json")
-      qrcodeFilePath = File.join(aTemplatePath, "#{templateName}_QR.png")
-      qrcode.as_png(file: qrcodeFilePath)
+      if LocalIP
+        qrcode = RQRCode::QRCode.new("http://#{LocalIP}:#{HTTPServerPort}/#{templateName}/data.json")
+        qrcodeFilePath = File.join(aTemplatePath, "#{templateName}_QR.png")
+        qrcode.as_png(file: qrcodeFilePath)
+      end
     }
 
     # 生成模版目录结构 .dir（HTTP Server 读取）
@@ -216,7 +227,7 @@ def live_server_run
       http_server.start
     }
 
-    puts "Start HTTP server: http://#{LocalIP}:#{HTTPServerPort}"
+    puts "Start HTTP server: http://#{LocalIP || '127.0.0.1'}:#{HTTPServerPort}"
 
     # File Watch
     listener = Listen.to(TemplatesPath, only: [/\.xml$/, /\.json$/]) { |modified, added, removed|

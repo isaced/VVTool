@@ -1,8 +1,9 @@
 #!/usr/bin/ruby
 
 require "vvtool/version"
-require "live_server.rb"
 require 'Thor'
+
+require_relative "live_server.rb"
 
 module VVTool
     class CLI < Thor
