@@ -159,109 +159,115 @@ module VVPrepare
   end
 end
 
-# 第一次
-def firstBuild()
-  # 0. Clean
-  VVPrepare.clean
+module VVTool
+  # 第一次
+  def firstBuild(check_dependency)
+    # 0. Clean
+    VVPrepare.clean
 
-  # 0.1 检查编译器 - 没有则下载
-  VVPrepare.checkVVCompiler
+    if check_dependency
+      # 0.1 检查编译器 - 没有则下载
+      VVPrepare.checkVVCompiler
 
-  # 0.2 检查 config.properties - 没有则下载
-  VVPrepare.checkVVConfigProperties
-
-  puts 'Start build templates...'
-
-  # 1. 拷贝出来集中所有 .xml 模版文件
-  VVPrepare.copyXML TemplatesPath
-
-  # 2. 生成 compiler.jar 编译所需的 templatelist.properties 文件
-  VVPrepare.generateProperties
-
-  # 3. 编译
-  VVPrepare.vvbuild
-
-  # 4. 生成 data.json
-  VVPrepare.generateDataJSON TemplatesPath
-
-  # 5. Clean
-  VVPrepare.clean
-
-  puts 'All templates build finished.'
-end
-
-# 单次编译
-public def singleBuild(aTemplatePath)
-  # 0. Clean
-  VVPrepare.clean
-
-  # 1. 拷贝出来集中所有 .xml 模版文件
-  VVPrepare.copyXML aTemplatePath
-
-
-  # 2. 生成 compiler.jar 编译所需的 templatelist.properties 文件
-  VVPrepare.generateProperties
-
-  # 3. 编译
-  VVPrepare.vvbuild
-
-  # 4. 生成 data.json
-  VVPrepare.generateDataJSON aTemplatePath
-
-  # 5. Clean
-  VVPrepare.clean
-end
-
-def live_server_run
-    firstBuild()
-
-    puts TemplatesPath
-    # HTTP Server
-    Thread.new {
-      http_server = WEBrick::HTTPServer.new(
-        :Port => HTTPServerPort,  
-        :DocumentRoot => TemplatesPath,
-        :Logger => WEBrick::Log.new(VVBuildLogFilePath),
-        :AccessLog => []
-        )
-      http_server.start
-    }
-
-    puts "Start HTTP server: http://#{LocalIP || '127.0.0.1'}:#{HTTPServerPort}"
-
-    # File Watch
-    listener = Listen.to(TemplatesPath, only: [/\.xml$/, /\.json$/]) { |modified, added, removed|
-      (modified + added).each { |filePath|
-        thisTemplatePath = Pathname.new(filePath).dirname
-        thisTemplateName = File.basename filePath, '.*'
-        thisTemplateNameAndExt = File.basename filePath
-        next if thisTemplateNameAndExt == 'data.json'
-        puts "[#{ Time.now.strftime("%H:%M:%S") }] Update template: #{thisTemplateName} (#{thisTemplateNameAndExt})"
-
-        self.singleBuild thisTemplatePath
-        VVPrepare.clean
-        $buildCount += 1
-      }
-    }.start
-
-    puts 'Start Watching...'
-    puts ''
-
-    trap "SIGINT" do
-      puts ''
-      puts "Bye, see you next time, build count: #{$buildCount}"
-      
-      # clean
-      FileUtils.rm_f VVBuildLogFilePath
-      FileUtils.rm_f DirFilePath
-
-      exit 130
+      # 0.2 检查 config.properties - 没有则下载
+      VVPrepare.checkVVConfigProperties
     end
 
-    # 从 RubyGems 上检查新版本
-    check_new_version
+    puts 'Start build templates...'
 
-    sleep
+    # 1. 拷贝出来集中所有 .xml 模版文件
+    VVPrepare.copyXML TemplatesPath
+
+    # 2. 生成 compiler.jar 编译所需的 templatelist.properties 文件
+    VVPrepare.generateProperties
+
+    # 3. 编译
+    VVPrepare.vvbuild
+
+    # 4. 生成 data.json
+    VVPrepare.generateDataJSON TemplatesPath
+
+    # 5. Clean
+    VVPrepare.clean
+
+    puts 'All templates build finished.'
+  end
+
+  # 单次编译
+  def singleBuild(aTemplatePath)
+    # 0. Clean
+    VVPrepare.clean
+
+    # 1. 拷贝出来集中所有 .xml 模版文件
+    VVPrepare.copyXML aTemplatePath
+
+
+    # 2. 生成 compiler.jar 编译所需的 templatelist.properties 文件
+    VVPrepare.generateProperties
+
+    # 3. 编译
+    VVPrepare.vvbuild
+
+    # 4. 生成 data.json
+    VVPrepare.generateDataJSON aTemplatePath
+
+    # 5. Clean
+    VVPrepare.clean
+  end
+
+  def live_server_run(check_dependency = true)
+      self.firstBuild(check_dependency)
+
+      puts TemplatesPath
+      # HTTP Server
+      Thread.new {
+        http_server = WEBrick::HTTPServer.new(
+          :Port => HTTPServerPort,  
+          :DocumentRoot => TemplatesPath,
+          :Logger => WEBrick::Log.new(VVBuildLogFilePath),
+          :AccessLog => []
+          )
+        http_server.start
+      }
+
+      puts "Start HTTP server: http://#{LocalIP || '127.0.0.1'}:#{HTTPServerPort}"
+
+      # File Watch
+      listener = Listen.to(TemplatesPath, only: [/\.xml$/, /\.json$/]) { |modified, added, removed|
+        (modified + added).each { |filePath|
+          thisTemplatePath = Pathname.new(filePath).dirname
+          thisTemplateName = File.basename filePath, '.*'
+          thisTemplateNameAndExt = File.basename filePath
+          next if thisTemplateNameAndExt == 'data.json'
+          puts "[#{ Time.now.strftime("%H:%M:%S") }] Update template: #{thisTemplateName} (#{thisTemplateNameAndExt})"
+
+          self.singleBuild thisTemplatePath
+          VVPrepare.clean
+          $buildCount += 1
+        }
+      }.start
+
+      puts 'Start Watching...'
+      puts ''
+
+      trap "SIGINT" do
+        puts ''
+        puts "Bye, see you next time, build count: #{$buildCount}"
+        
+        # clean
+        FileUtils.rm_f VVBuildLogFilePath
+        FileUtils.rm_f DirFilePath
+
+        exit 130
+      end
+
+      # 从 RubyGems 上检查新版本
+      check_new_version
+
+      sleep
+  end
+
+  module_function :live_server_run
+  module_function :firstBuild
+  module_function :singleBuild
 end
-
-# live_server_run

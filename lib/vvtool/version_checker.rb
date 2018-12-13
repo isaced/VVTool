@@ -2,7 +2,7 @@
 
 require 'net/http'
 require 'json'
-require_relative "vvtool/version.rb"
+require 'vvtool/version.rb'
 
 RubyGemsLatestVersionURL = 'https://rubygems.org/api/v1/versions/vvtool/latest.json'
 

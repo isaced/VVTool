@@ -1,15 +1,16 @@
 #!/usr/bin/ruby
 
 require "vvtool/version"
+require "vvtool/live_server.rb"
 require 'Thor'
 
-require_relative "live_server.rb"
 
 module VVTool
+
     class CLI < Thor
       desc "run", "启动 VirtualView 实时预览服务"
       def runLiveServer
-        live_server_run
+        VVTool::live_server_run()
       end
 
       desc "about", "关于"
