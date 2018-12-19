@@ -9,9 +9,12 @@ require 'json'
 require 'net/http'
 require 'socket'
 require 'rqrcode'
+require 'rainbow/refinement'
 
 require_relative 'utils.rb'
 require_relative "version_checker.rb"
+
+using Rainbow
 
 # 路径
 PropertiesFileName = 'templatelist.properties'
@@ -125,9 +128,12 @@ module VVPrepare
       templateParams = {}
       templateParamsJSONPath = File.join(aTemplatePath, "#{templateName}.json")
       if File.exist?(templateParamsJSONPath)
-        templateParams = JSON.parse(File.read(templateParamsJSONPath))
+        begin
+          templateParams = JSON.parse(File.read(templateParamsJSONPath))
+        rescue JSON::ParserError => e
+          puts "[ERROR] - JSON parsing failed! (#{templateName}.json)".red
+        end
       end
-      
 
       # 合并 data.json （HTTP Server 读取）
       if xmlBase64List.count > 0
@@ -230,7 +236,7 @@ module VVTool
         http_server.start
       }
 
-      puts "Start HTTP server: http://#{LocalIP || '127.0.0.1'}:#{HTTPServerPort}"
+      puts "Start HTTP server: " + "http://#{LocalIP || '127.0.0.1'}:#{HTTPServerPort}".blue.bright.underline
 
       # File Watch
       listener = Listen.to(TemplatesPath, only: [/\.xml$/, /\.json$/]) { |modified, added, removed|
